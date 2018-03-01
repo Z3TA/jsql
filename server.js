@@ -14,6 +14,21 @@ httpServer.on("error", httpServerError);
 httpServer.on("listening", notifyListening);
 httpServer.listen(unixSocket);
 
+var sockjs = require('sockjs');
+var sockjsServer = sockjs.createServer({ sockjs_url: 'http://cdn.jsdelivr.net/sockjs/1.0.1/sockjs.min.js' });
+sockjsServer.on('connection', function(conn) {
+	var IP = conn.headers["x-real-ip"] || conn.remoteAddress;
+	console.log("New sockjs connection from " + IP);
+	conn.on('data', function(message) {
+		console.log(IP + " <= " + message);
+		conn.write(message);
+	});
+	conn.on('close', function() {});
+});
+
+sockjsServer.installHandlers(httpServer, {prefix:'/sockjs'});
+
+
 function httpRequest(request, response) {
 	console.log("Request to " + request.url + " from " + (request.headers["x-real-ip"] || request.connection.remoteAddress));
 	response.end('Hello from jsql!');

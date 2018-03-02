@@ -5,19 +5,19 @@ var CLIENT = {};
 (function() {
 "use strict";
 
-	var sock = new SockJS('http://johan.webide.se/_jsql/sockjs');
+	var sockjs = new SockJS('http://johan.webide.se/_jsql/sockjs');
 	
-	sock.onopen = function() {
+	sockjs.onopen = function() {
 		console.log('open');
-		sock.send('test');
+		sockjs.send('test');
 	};
 	
-	sock.onmessage = function(e) {
+	sockjs.onmessage = function(e) {
 		console.log('message', e.data);
-		sock.close();
+		sockjs.close();
 	};
 	
-	sock.onclose = function() {
+	sockjs.onclose = function() {
 		console.log('close');
 	};
 	
@@ -30,8 +30,9 @@ CLIENT.api = function api(command, options, callback) {
 		
 		sockjs.send(JSON.stringify(action));
 	
-	
-});
+		callback(null, {text: "tjohej"});
+		
+};
 
 
 })();

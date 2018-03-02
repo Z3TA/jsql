@@ -1,4 +1,7 @@
 
+(function() {
+"use strict";
+
 window.onload = function windowLoaded() {
 	CLIENT.connect();
 };
@@ -14,3 +17,4 @@ button.onclick = function buttonClicked() {
 	
 };
 
+})();

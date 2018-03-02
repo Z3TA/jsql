@@ -2,8 +2,11 @@
 // if this was a module we where to export the CLIENT object
 var CLIENT = {};
 
-CLIENT.connect = function connect() {
+(function() {
+"use strict";
+
 	var sock = new SockJS('http://johan.webide.se/_jsql/sockjs');
+	
 	sock.onopen = function() {
 		console.log('open');
 		sock.send('test');
@@ -17,13 +20,18 @@ CLIENT.connect = function connect() {
 	sock.onclose = function() {
 		console.log('close');
 	};
-};
-
+	
 CLIENT.api = function api(command, options, callback) {
 
+		var action = {
+			command: command,
+			options: options
+		}
+		
+		sockjs.send(JSON.stringify(action));
 	
 	
 });
 
 
-
+})();

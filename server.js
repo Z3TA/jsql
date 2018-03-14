@@ -26,13 +26,44 @@ sockjsServer.on('connection', function(conn) {
 	conn.on('close', function() {});
 });
 
-sockjsServer.installHandlers(httpServer, {prefix:'/sockjs'});
+sockjsServer.installHandlers(httpServer, {prefix:'/sockjs', disable_cors: true});
 
 
 function httpRequest(request, response) {
-	console.log("Request to " + request.url + " from " + (request.headers["x-real-ip"] || request.connection.remoteAddress));
-	response.end('Hello from jsql!');
-}
+	var IP = request.headers["x-real-ip"] || request.connection.remoteAddress;
+	console.log("Request to " + request.url + " from " + IP);
+	//console.log("Request Headers: " + JSON.stringify(request.headers, null, 2));
+	
+	var origin = request.headers["origin"];
+	
+	if(typeof response.getHeaders == "function") {
+console.log("Response Headers: " + JSON.stringify(response.getHeaders(), null, 2));
+	}
+	
+	/*
+		Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote
+		resource at ‘https://johan.webide.se/_jsql/sockjs/info?t=1520935763186’.
+		(Reason: Credential is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’).
+	*/
+	//response.removeHeader('Access-Control-Allow-Origin');
+	if(!origin) origin = "*";
+	response.setHeader("Access-Control-Allow-Origin", origin)
+	
+	/*
+		Failed to load https://johan.webide.se/_jsql/sockjs/info?t=1520951694353: 
+		The value of the 'Access-Control-Allow-Credentials' header in the response is '' 
+		which must be 'true' when the request's credentials mode is 'include'. 
+		Origin 'https://webide.se' is therefore not allowed access. 
+		The credentials mode of requests initiated by the XMLHttpRequest is 
+		controlled by the withCredentials attribute.
+	*/
+	
+	response.setHeader("Access-Control-Allow-Origin", origin);
+	response.setHeader("Access-Control-Allow-Credentials", "true")
+	
+	
+		response.end('Hello from jsql!');
+	}
 
 function httpServerError(err) {
 	console.log("HTTP server error: " + err.message);

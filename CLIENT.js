@@ -5,7 +5,7 @@ var CLIENT = {};
 (function() {
 "use strict";
 
-	var sockjs = new SockJS('http://johan.webide.se/_jsql/sockjs');
+	var sockjs = new SockJS('https://johan.webide.se/_jsql/sockjs');
 	
 	sockjs.onopen = function() {
 		console.log('open');

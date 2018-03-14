@@ -1,4 +1,6 @@
 
+if(process.env.myName) {
+
 // Socket to listen to ... HTTP requests to http://yourname.webide.se/_somename will be redirected to to /sock/_somename
 var unixSocket = "/sock/_jsql";
 
@@ -6,13 +8,20 @@ var unixSocket = "/sock/_jsql";
 var newMask = parseInt("0007", 8); // four digits, last three mask, ex: 0o027 => 750 file permissions
 var oldMask = process.umask(newMask);
 console.log("Changed umask from " + oldMask.toString(8) + " to " + newMask.toString(8));
+	var hostname = process.env.myName + ".webide.se";
+	
+}
+else {
+	var port = 8081;
+	var hostname = "127.0.0.1";
+}
 
 var http = require('http');
 var httpServer = http.createServer();
 httpServer.on("request", httpRequest);
 httpServer.on("error", httpServerError);
 httpServer.on("listening", notifyListening);
-httpServer.listen(unixSocket);
+httpServer.listen(unixSocket || port);
 
 var sockjs = require('sockjs');
 var sockjsServer = sockjs.createServer({ sockjs_url: 'http://cdn.jsdelivr.net/sockjs/1.0.1/sockjs.min.js' });
@@ -26,8 +35,8 @@ sockjsServer.on('connection', function(conn) {
 	conn.on('close', function() {});
 });
 
-sockjsServer.installHandlers(httpServer, {prefix:'/sockjs', disable_cors: true});
-
+//sockjsServer.installHandlers(httpServer, {prefix:'/sockjs', disable_cors: true});
+sockjsServer.installHandlers(httpServer, {prefix:'/sockjs', disable_cors: false});
 
 function httpRequest(request, response) {
 	var IP = request.headers["x-real-ip"] || request.connection.remoteAddress;
@@ -77,5 +86,6 @@ function httpServerError(err) {
 }
 
 function notifyListening() {
-	console.log("Listening on http://" + process.env.myName + ".webide.se/" + unixSocket.split("/")[2]);
+	if(unixSocket) console.log("Listening on http://" + hostname + "/" + unixSocket.split("/")[2]);
+	else console.log("Listening on http://" + hostname + ":" + port + "");
 }

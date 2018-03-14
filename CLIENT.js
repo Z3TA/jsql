@@ -5,7 +5,18 @@ var CLIENT = {};
 (function() {
 "use strict";
 
-	var sockjs = new SockJS('https://johan.webide.se/_jsql/sockjs');
+	var host = document.location.hostname;
+	var port = 8081; // Hardcoded, same as server.js !!
+	var reWebide = /(.*)\.webide\.se/
+	
+	if(host.match(reWebide)) {
+		var sockjsAddr = "https://" + host + "/_jsql/sockjs";
+	}
+	else {
+		var sockjsAddr = "http://" + host + ":" + port + "/sockjs";
+	}
+	
+	var sockjs = new SockJS(sockjsAddr);
 	
 	sockjs.onopen = function() {
 		console.log('open');

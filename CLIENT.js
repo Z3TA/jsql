@@ -1,9 +1,15 @@
-// This file and the CLIENT variable in all caps to indicate it is a global object/variable
-// if this was a module we where to export the CLIENT object
+"use strict";
+
+/*
+	
+	The name of this file and the CLIENT variable are in all caps 
+	to indicate it's a global object/variable
+	
+*/
 var CLIENT = {};
 
+// Self calling function to allow leaking variables to global scope
 (function() {
-"use strict";
 
 	var host = document.location.hostname;
 	
@@ -11,13 +17,15 @@ var CLIENT = {};
 	var port = 8081;
 	var unixSocket = "_jsql";
 	
+	
 	// When using the unix socket:
-	var sockjsAddr = "https://johan.webide.se/" + unixSocket + "/sockjs";
+	var domain = "johan.webide.se"; // <-- change to your own domain!
+	var sockjsAddr = "https://" + domain "/" + unixSocket + "/sockjs";
 	// Or uncomment the line below if you use port instead
 	//var sockjsAddr = "http://" + host + ":" + port + "/sockjs";
 	
 	// I's important to use the same host or you'll be figting CORS errors
-	// You have to start the browser's dev tool to see CORS errors in console
+	// Start the browser's dev tool's console to see CORS errors.
 	
 	console.log("sockjsAddr=" + sockjsAddr);
 	var sockjs = new SockJS(sockjsAddr);

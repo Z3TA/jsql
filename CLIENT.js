@@ -6,16 +6,20 @@ var CLIENT = {};
 "use strict";
 
 	var host = document.location.hostname;
-	var port = 8081; // Hardcoded, same as server.js !!
-	var reWebide = /(.*)\.webide\.se/
 	
-	if(host.match(reWebide)) {
-		var sockjsAddr = "https://" + host + "/_jsql/sockjs";
-	}
-	else {
-		var sockjsAddr = "http://" + host + ":" + port + "/sockjs";
-	}
+	// Port and unix socket (named pipe) is hard coded in server.js !!
+	var port = 8081;
+	var unixSocket = "_jsql";
 	
+	// When using the unix socket:
+	var sockjsAddr = "https://johan.webide.se/" + unixSocket + "/sockjs";
+	// Or uncomment the line below if you use port instead
+	//var sockjsAddr = "http://" + host + ":" + port + "/sockjs";
+	
+	// I's important to use the same host or you'll be figting CORS errors
+	// You have to start the browser's dev tool to see CORS errors in console
+	
+	console.log("sockjsAddr=" + sockjsAddr);
 	var sockjs = new SockJS(sockjsAddr);
 	
 	sockjs.onopen = function() {

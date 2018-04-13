@@ -10,7 +10,7 @@ window.onload = function windowLoaded() {
 				console.log(resp);
 				var message = document.getElementById("message");
 				if(err) return alert(err.message);
-				else message.innerText = resp.text;
+				else message.innerText = resp;
 			});
 			
 		};

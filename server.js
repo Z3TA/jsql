@@ -33,14 +33,52 @@ var sockjsServer = sockjs.createServer({
 sockjs_url: 'http://cdn.jsdelivr.net/sockjs/1.0.1/sockjs.min.js'
 });
 
+var API = require("./api.js");
+
+// API.someNamespace = require("./plugin/nother.js");
+
 sockjsServer.on('connection', function(conn) {
 	var IP = conn.headers["x-real-ip"] || conn.remoteAddress;
 	console.log("New sockjs connection from " + IP);
 	conn.on('data', function(message) {
-		console.log(IP + " <= " + message);
-		conn.write(message);
+		
+		// Parse the request
+		try {
+			var req = JSON.parse(message);
+		}
+		catch(err) {
+			return send({error: "Failed to parse JSON (" + err.message + "): " + message});
+		}
+		
+		if(!req.command) return send({error: "No command property in: " + message});
+		
+		if(!API.hasOwnProperty(req.command)) return send({error: "command=" + req.command + " is not a vaild api call!"});
+		
+		// Call the api command
+		API[req.command](req.options, function apiCallback(err, resp) {
+			if(err) {
+				console.error(err);
+				return send({error: err.message});
+			}
+			else {
+				return send({resp: resp});
+			}
+		});
+		
+		function send(resp) {
+			
+			console.log("Sending resp=" + resp + " (" + JSON.stringify(resp) + ")");
+			
+			if(req && req.id) resp.id = req.id;
+			
+			var str = JSON.stringify(resp);
+			conn.write(str);
+		}
+		
 	});
 	conn.on('close', function() {});
+	
+	
 });
 
 //sockjsServer.installHandlers(httpServer, {prefix:'/sockjs', disable_cors: true});
@@ -59,7 +97,7 @@ function httpRequest(request, response) {
 	// PS. You might also need to have SSL/HTTPS
 	var origin = request.headers["origin"];
 	if(typeof response.getHeaders == "function") {
-console.log("Response Headers: " + JSON.stringify(response.getHeaders(), null, 2));
+		console.log("Response Headers: " + JSON.stringify(response.getHeaders(), null, 2));
 	}
 	/*
 		Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote
@@ -80,8 +118,8 @@ console.log("Response Headers: " + JSON.stringify(response.getHeaders(), null, 2
 	response.setHeader("Access-Control-Allow-Credentials", "true")
 	
 	
-		response.end('Hello from jsql! This request was not handled by sockjs!');
-	}
+	response.end('Hello from jsql! This request was not handled by sockjs!');
+}
 
 function httpServerError(err) {
 	console.log("HTTP server error: " + err.message);

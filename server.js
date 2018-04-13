@@ -19,6 +19,8 @@ else {
 	var port = 8081;
 	var hostname = "127.0.0.1";
 	var sockJsPrefix = "/sockjs";
+	
+	console.log("Use something like http-server .to serve client.htm");
 }
 
 var http = require('http');
@@ -118,7 +120,7 @@ function httpRequest(request, response) {
 	response.setHeader("Access-Control-Allow-Credentials", "true")
 	
 	
-	response.end('Hello from jsql! This request was not handled by sockjs!');
+	response.end('Hello from jsql! This request was NOT handled by sockjs!');
 }
 
 function httpServerError(err) {

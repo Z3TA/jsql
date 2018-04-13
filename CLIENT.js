@@ -20,7 +20,7 @@ var CLIENT = {}; // Global object so you can call CLIENT.api() from anywhere
 	
 	var host = document.location.hostname;
 	console.log("host=" + host);
-	if(host == "localhost") {
+	if(host == "localhost" || host == "127.0.0.1") {
 		var port = 8081; // Port is hardcoded in server.js
 		var sockjsAddr = "http://" + host + ":" + port + "/sockjs";
 	}
